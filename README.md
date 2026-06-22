@@ -165,6 +165,29 @@ python3 pca/main.py
 - 手写中心化、协方差矩阵、幂迭代和正交化。
 - 每一帧展示主成分方向如何逐步旋转到最大方差方向。
 
+### 8. 随机森林
+
+目录：
+
+```bash
+random_forest/
+```
+
+![随机森林逐步构建演示](random_forest/rf-demo.png)
+
+运行：
+
+```bash
+python3 random_forest/main.py
+```
+
+特点：
+
+- 不调用 `sklearn.ensemble.RandomForestClassifier`。
+- 自己生成复杂二维分类数据。
+- 手写 bootstrap、CART 节点分裂、Gini impurity 和森林投票。
+- 每一帧展示新节点 split 和投票边界如何变化。
+
 ## 设计原则
 
 - 算法训练过程尽量手写，避免调用库隐藏核心步骤。
