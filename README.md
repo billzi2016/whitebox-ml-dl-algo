@@ -123,6 +123,27 @@ python3 umap/main.py
 - 手写 k 近邻图、fuzzy graph 权重和低维吸引/排斥优化。
 - 每一帧展示 embedding 如何在邻域保持和排斥力之间逐步展开。
 
+### 6. DBSCAN
+
+目录：
+
+```bash
+dbscan/
+```
+
+运行：
+
+```bash
+python3 dbscan/main.py
+```
+
+特点：
+
+- 不调用 `sklearn.cluster.DBSCAN`。
+- 自己生成月牙、螺旋、小岛和噪声组成的复杂密度点云。
+- 手写 eps 邻域、核心点判定、噪声标记和密度可达扩展。
+- 每一帧展示 DBSCAN 如何从核心点开始扩张簇。
+
 ## 设计原则
 
 - 算法训练过程尽量手写，避免调用库隐藏核心步骤。
