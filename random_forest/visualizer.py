@@ -89,12 +89,12 @@ class RandomForestAnimator:
         """生成右侧树节点文本。"""
         sample_count = len(node["indices"])
         if node["is_leaf"]:
-            return f"#{node_id}\nleaf={node['prediction']}\nn={sample_count}\ngini={node['gini']:.2f}"
+            if "prediction" in node:
+                return f"#{node_id}\nleaf={node['prediction']}\nn={sample_count}\ngini={node['gini']:.2f}"
+            return f"#{node_id}\nweight={node['weight']:.2f}\nn={sample_count}"
         feature = "x" if node["feature"] == 0 else "y"
-        return (
-            f"#{node_id}\n{feature} <= {node['threshold']:.2f}\n"
-            f"n={sample_count}\ngini={node['gini']:.2f}"
-        )
+        impurity_text = f"gini={node['gini']:.2f}" if "gini" in node else f"gain={node['gain']:.2f}"
+        return f"#{node_id}\n{feature} <= {node['threshold']:.2f}\nn={sample_count}\n{impurity_text}"
 
     def _draw_current_tree(self, snapshot):
         """右侧绘制当前正在构造的树。"""
@@ -126,7 +126,10 @@ class RandomForestAnimator:
                 edge = "#111111"
                 line_width = 2.2
             elif node["is_leaf"]:
-                face = "#c9daf8" if node["prediction"] == 1 else "#f6c7b6"
+                if "prediction" in node:
+                    face = "#c9daf8" if node["prediction"] == 1 else "#f6c7b6"
+                else:
+                    face = "#c9daf8" if node["weight"] >= 0 else "#f6c7b6"
                 edge = "#333333"
                 line_width = 1.2
             else:
@@ -153,7 +156,8 @@ class RandomForestAnimator:
         ys = [pos[1] for pos in positions.values()]
         self.ax_tree.set_xlim(min(xs) - 1.25, max(xs) + 1.25)
         self.ax_tree.set_ylim(min(ys) - 1.05, 0.95)
-        self.ax_tree.set_title(f"Current tree structure: tree {tree_index + 1}/{self.forest.n_trees}")
+        total_trees = getattr(self.forest, "n_trees", getattr(self.forest, "n_estimators", len(self.forest.trees)))
+        self.ax_tree.set_title(f"Current tree structure: tree {tree_index + 1}/{total_trees}")
         self.ax_tree.axis("off")
 
     def draw_frame(self):
@@ -188,11 +192,12 @@ class RandomForestAnimator:
                     self.ax_data.axhline(split["threshold"], color="#111111", linestyle="--", linewidth=2.0, label="latest split")
 
         built_trees = len(snapshot["trees"])
+        total_trees = getattr(self.forest, "n_trees", getattr(self.forest, "n_estimators", built_trees))
         node_count = sum(len(tree["nodes"]) for tree in snapshot["trees"])
         self.fig.suptitle(
             "Random Forest building: "
             f"frame {self.frame_index + 1}/{self.max_frames + 1} | "
-            f"phase {snapshot['phase']} | trees {built_trees}/{self.forest.n_trees} | nodes {node_count}",
+            f"phase {snapshot['phase']} | trees {built_trees}/{total_trees} | nodes {node_count}",
             fontsize=14,
         )
         self.ax_data.set_title("Forest vote boundary and latest split")

@@ -2,6 +2,8 @@
 
 这个目录演示 DBSCAN 的密度聚类过程，不调用 `sklearn.cluster.DBSCAN`。
 
+![DBSCAN 密度扩展过程演示](dbscan-demo.png)
+
 当前实现手写：
 
 - eps 邻域查询。

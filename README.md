@@ -110,6 +110,8 @@ python3 tsne/main.py
 umap/
 ```
 
+![UMAP 邻域图优化过程演示](umap/umap-demo.png)
+
 运行：
 
 ```bash
@@ -131,6 +133,8 @@ python3 umap/main.py
 dbscan/
 ```
 
+![DBSCAN 密度扩展过程演示](dbscan/dbscan-demo.png)
+
 运行：
 
 ```bash
@@ -151,6 +155,8 @@ python3 dbscan/main.py
 ```bash
 pca/
 ```
+
+![PCA 主成分迭代过程演示](pca/pca-demo.png)
 
 运行：
 
@@ -187,6 +193,29 @@ python3 random_forest/main.py
 - 自己生成复杂二维分类数据。
 - 手写 bootstrap、CART 节点分裂、Gini impurity 和森林投票。
 - 每一帧展示新节点 split 和投票边界如何变化。
+
+### 9. XGBoost 风格梯度提升树
+
+目录：
+
+```bash
+xgboost/
+```
+
+![XGBoost 风格梯度提升过程演示](xgboost/xgboost-demo.png)
+
+运行：
+
+```bash
+python3 xgboost/main.py
+```
+
+特点：
+
+- 不调用 `xgboost` 库。
+- 自己生成复杂二维二分类数据。
+- 手写 logloss 梯度/海森、二阶 CART、split gain 和叶子权重。
+- 每一帧展示提升树如何逐步修正当前概率边界。
 
 ## 设计原则
 

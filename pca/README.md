@@ -2,6 +2,8 @@
 
 这个目录演示 PCA 的算法过程，不调用 `sklearn.decomposition.PCA`。
 
+![PCA 主成分迭代过程演示](pca-demo.png)
+
 当前实现手写：
 
 - 数据中心化。
