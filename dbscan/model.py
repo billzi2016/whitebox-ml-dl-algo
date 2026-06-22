@@ -84,6 +84,15 @@ class DBSCANOptimizer:
             self._expand_one()
             return
 
+        # 当前簇的扩展队列已经耗尽，说明这个簇完整结束。
+        # 必须先递增 cluster_id，再去寻找下一个未访问核心点；
+        # 否则后续互不连通的簇会被错误地继续标成 cluster 0。
+        if self.phase in {"start cluster", "expand cluster"}:
+            self.cluster_id += 1
+            self.phase = "finish cluster"
+            self.current_point = None
+            return
+
         point = self._next_unvisited()
         if point is None:
             self.finished = True

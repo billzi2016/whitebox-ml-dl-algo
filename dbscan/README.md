@@ -19,7 +19,7 @@ python3 dbscan/main.py
 可调参数：
 
 ```bash
-python3 dbscan/main.py --eps 0.34 --min-samples 6
+python3 dbscan/main.py --eps 0.34 --min-samples 5
 python3 dbscan/main.py --eps 0.28 --min-samples 5
 ```
 
