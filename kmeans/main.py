@@ -3,7 +3,7 @@ import os
 import sys
 
 if __package__ is None or __package__ == "":
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from kmeans.data import make_complex_gaussian_data
 from kmeans.model import KMeansOptimizer

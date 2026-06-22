@@ -2,6 +2,8 @@
 
 这个目录演示 K-Means 的算法过程，不调用 `sklearn.cluster.KMeans`，也不是直接给最终结果。
 
+![K-Means 逐步优化过程演示](kmeans-demo.png)
+
 当前实现只用 `numpy` 手写：
 
 - 复杂二维高斯混合数据生成。

@@ -2,7 +2,7 @@
 
 这个目录演示的是 RBF 特征空间里的 SVM 优化过程。这里不使用 `sklearn.svm.SVC`，因为库函数会把核矩阵、二次规划和内部优化过程全部封装掉，只给最终模型，不能展示算法一步一步怎么变。
 
-![RBF SVM 风车 XOR 优化过程演示](demo.png)
+![RBF SVM 风车 XOR 优化过程演示](svm_rbf-demo.png)
 
 当前实现只用 `numpy` 手写训练过程：
 
