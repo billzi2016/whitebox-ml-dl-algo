@@ -2,6 +2,8 @@
 
 这个目录演示的是 RBF 特征空间里的 SVM 优化过程。这里不使用 `sklearn.svm.SVC`，因为库函数会把核矩阵、二次规划和内部优化过程全部封装掉，只给最终模型，不能展示算法一步一步怎么变。
 
+![RBF SVM 风车 XOR 优化过程演示](demo.png)
+
 当前实现只用 `numpy` 手写训练过程：
 
 - 手写 RBF 特征映射。
@@ -12,6 +14,8 @@
 - 每一帧保存一次参数快照，用于 `Previous`、`Next` 和进度条回放。
 
 `sklearn.datasets` 只用于加载 Iris 数据，不参与模型训练。
+
+注意：二分类 `xor` 使用一个真正的二分类 SVM，通过分数正负决定红/蓝类别；三分类 `iris` 才使用 one-vs-rest。这样可以避免二分类时两个 one-vs-rest 分类器互相抢分，导致训练点分对但背景区域不明显的问题。
 
 ## 1. 文件结构
 
@@ -40,6 +44,11 @@ python3 svm_rbf/main.py xor
 python3 svm_rbf/main.py xor --gamma 2.0 --c 1.0 --learning-rate 0.08
 python3 svm_rbf/main.py iris --gamma 0.8 --c 1.5 --updates-per-frame 5
 ```
+
+默认参数按数据集区分：
+
+- `xor`：`gamma=6.0`，`C=10.0`，`learning_rate=0.1`，用于更清楚地形成风车形非线性边界。
+- `iris`：`gamma=1.0`，`C=1.0`，`learning_rate=0.08`，避免二维 Iris 投影过度贴点。
 
 ## 3. RBF 特征映射
 

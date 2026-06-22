@@ -157,6 +157,7 @@ class RBFSVMAnimator:
         self.ax.set_title(
             f"{self.title}: frame {self.frame_index + 1}/{self.max_frames + 1} | "
             f"updates {self.frame_index * self.updates_per_frame} | "
+            f"gamma {self.optimizer.gamma:g} | C {self.optimizer.c:g} | "
             f"loss {snapshot['loss']:.2f} | "
             f"margin violations {snapshot['violations']}",
             fontsize=14,

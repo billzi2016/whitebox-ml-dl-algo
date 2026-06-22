@@ -13,7 +13,13 @@ class RBFKernelSVMOptimizer:
         self.learning_rate = learning_rate
 
         self.classes = np.unique(y)
-        self.class_count = len(self.classes)
+        self.output_class_count = len(self.classes)
+        self.is_binary = self.output_class_count == 2
+
+        # 二分类只需要一个 SVM：score >= 0 判为正类，score < 0 判为负类。
+        # 如果二分类也强行训练两个 one-vs-rest 分类器，两个打分函数可能互相抵消，
+        # 背景区域会出现“训练点分对了，但大面积颜色仍然不对”的视觉问题。
+        self.classifier_count = 1 if self.is_binary else self.output_class_count
         self.sample_count = len(x_raw)
 
         # RBF 核依赖欧氏距离，所以必须统一尺度。
@@ -32,9 +38,9 @@ class RBFKernelSVMOptimizer:
         self.w = rng.normal(
             loc=0.0,
             scale=0.01,
-            size=(self.class_count, self.feature_count),
+            size=(self.classifier_count, self.feature_count),
         )
-        self.b = np.zeros(self.class_count)
+        self.b = np.zeros(self.classifier_count)
 
     def _standardize(self, x_raw):
         """用训练集统计量标准化二维坐标。"""
@@ -56,7 +62,10 @@ class RBFKernelSVMOptimizer:
 
     def predict(self, x_raw):
         """取打分最高的类别作为预测类别。"""
-        return np.argmax(self.scores(x_raw), axis=1)
+        scores = self.scores(x_raw)
+        if self.is_binary:
+            return np.where(scores[:, 0] >= 0.0, self.classes[1], self.classes[0])
+        return self.classes[np.argmax(scores, axis=1)]
 
     def loss_and_gradients(self):
         """计算 RBF 特征空间中 SVM 目标函数和 batch 梯度。"""
@@ -65,10 +74,15 @@ class RBFKernelSVMOptimizer:
         total_hinge = 0.0
         total_violations = 0
 
-        for class_id in range(self.class_count):
-            # one-vs-rest：当前类别为 +1，其他类别为 -1。
-            y_binary = np.where(self.y == class_id, 1.0, -1.0)
-            scores = self.phi @ self.w[class_id] + self.b[class_id]
+        for classifier_id in range(self.classifier_count):
+            if self.is_binary:
+                # 二分类：只训练一个分类器，第二个类别是 +1，第一个类别是 -1。
+                y_binary = np.where(self.y == self.classes[1], 1.0, -1.0)
+            else:
+                # 多分类：one-vs-rest，当前类别为 +1，其他类别为 -1。
+                y_binary = np.where(self.y == self.classes[classifier_id], 1.0, -1.0)
+
+            scores = self.phi @ self.w[classifier_id] + self.b[classifier_id]
             margins = y_binary * scores
 
             # margin < 1 的样本会产生 hinge loss 和梯度。
@@ -78,10 +92,10 @@ class RBFKernelSVMOptimizer:
             total_violations += int(active.sum())
 
             # L = 1/2 ||w||^2 + C * sum(max(0, 1 - y f(x)))
-            grad_w[class_id] = self.w[class_id] - self.c * (
+            grad_w[classifier_id] = self.w[classifier_id] - self.c * (
                 y_binary[active, None] * self.phi[active]
             ).sum(axis=0)
-            grad_b[class_id] = -self.c * y_binary[active].sum()
+            grad_b[classifier_id] = -self.c * y_binary[active].sum()
 
         regularization = 0.5 * np.sum(self.w * self.w)
         total_loss = regularization + self.c * total_hinge
