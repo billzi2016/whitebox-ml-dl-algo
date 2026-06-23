@@ -1,226 +1,270 @@
 # Whitebox ML/DL Algorithms
 
-这个仓库用于做“白盒算法过程演示”。重点不是调用库直接给最终结果，而是把算法内部每一步拆开，用动画展示参数、中心、嵌入坐标或决策边界如何逐渐变化。
+This repository is a collection of whitebox algorithm animations. The goal is not to call a library and show the final result. The goal is to expose the internal steps of each algorithm and visualize how parameters, centers, embeddings, trees, or decision boundaries evolve over time.
 
-## 当前包含的演示
+Chinese version: [README_CN.md](README_CN.md)
 
-### 1. 线性 SVM
+## Demos
 
-目录：
+### 1. Linear SVM
+
+Directory:
 
 ```bash
 svm_linear/
 ```
 
-![线性 SVM 优化过程演示](svm_linear/svm_linear-demo.png)
+![Linear SVM optimization demo](svm_linear/svm_linear-demo.png)
 
-运行：
+Run:
 
 ```bash
 python3 svm_linear/svm_linear_iris_animation.py
 ```
 
-特点：
+Highlights:
 
-- 使用 Iris 数据集前两个特征。
-- 手写线性 SVM 的 hinge loss、L2 正则和梯度下降。
-- 三分类使用 one-vs-rest。
-- 每一帧展示 \(w,b\) 参数优化后的边界变化。
+- Uses the first two features of the Iris dataset.
+- Implements hinge loss, L2 regularization, and gradient descent by hand.
+- Uses one-vs-rest for the three-class problem.
+- Each frame shows how the boundary changes as \(w,b\) are optimized.
 
 ### 2. RBF SVM
 
-目录：
+Directory:
 
 ```bash
 svm_rbf/
 ```
 
-![RBF SVM 风车 XOR 优化过程演示](svm_rbf/svm_rbf-demo.png)
+![RBF SVM windmill XOR demo](svm_rbf/svm_rbf-demo.png)
 
-运行：
+Run:
 
 ```bash
 python3 svm_rbf/main.py iris
 python3 svm_rbf/main.py xor
 ```
 
-特点：
+Highlights:
 
-- 不调用 `sklearn.svm.SVC`。
-- 手写 RBF 特征映射：
+- Does not call `sklearn.svm.SVC`.
+- Implements the RBF feature map manually:
 
 \[
 \phi_j(x)=\exp(-\gamma\lVert x-c_j\rVert^2)
 \]
 
-- 在 RBF 特征空间里手写 SVM 优化。
-- 支持 Iris 三分类和 16 点风车 XOR。
+- Optimizes a linear SVM in the RBF feature space.
+- Supports both Iris classification and a 16-point windmill XOR dataset.
 
 ### 3. K-Means
 
-目录：
+Directory:
 
 ```bash
 kmeans/
 ```
 
-![K-Means 逐步优化过程演示](kmeans/kmeans-demo.png)
+![K-Means optimization demo](kmeans/kmeans-demo.png)
 
-运行：
+Run:
 
 ```bash
 python3 kmeans/main.py
 ```
 
-特点：
+Highlights:
 
-- 不调用 `sklearn.cluster.KMeans`。
-- 自己生成复杂二维高斯混合数据。
-- 手写 assignment step、update step 和 SSE。
-- 每一帧展示点重新分配或中心移动。
+- Does not call `sklearn.cluster.KMeans`.
+- Generates a complex 2D Gaussian mixture dataset.
+- Implements assignment, center update, and SSE manually.
+- Each frame shows either point reassignment or center movement.
 
 ### 4. t-SNE
 
-目录：
+Directory:
 
 ```bash
 tsne/
 ```
 
-![t-SNE 几何点云优化过程演示](tsne/tsne-demo.png)
+![t-SNE geometric point cloud demo](tsne/tsne-demo.png)
 
-运行：
+Run:
 
 ```bash
 python3 tsne/main.py
 ```
 
-特点：
+Highlights:
 
-- 不调用 `sklearn.manifold.TSNE`。
-- 自己生成几何图案点云。
-- 手写高维相似度 \(P\)、低维 t 分布相似度 \(Q\)、KL 散度和梯度下降。
-- 每一帧展示低维嵌入被吸引和排斥不断拉扯的过程。
+- Does not call `sklearn.manifold.TSNE`.
+- Generates a geometric point cloud.
+- Implements high-dimensional similarity \(P\), low-dimensional Student-t similarity \(Q\), KL divergence, and gradient descent manually.
+- Each frame shows the embedding being pulled and pushed by attraction and repulsion forces.
 
 ### 5. UMAP
 
-目录：
+Directory:
 
 ```bash
 umap/
 ```
 
-![UMAP 邻域图优化过程演示](umap/umap-demo.png)
+![UMAP neighborhood optimization demo](umap/umap-demo.png)
 
-运行：
+Run:
 
 ```bash
 python3 umap/main.py
 ```
 
-特点：
+Highlights:
 
-- 不调用 `umap-learn`。
-- 自己生成几何高维流形数据。
-- 手写 k 近邻图、fuzzy graph 权重和低维吸引/排斥优化。
-- 每一帧展示 embedding 如何在邻域保持和排斥力之间逐步展开。
+- Does not call `umap-learn`.
+- Generates a geometric high-dimensional manifold.
+- Implements k-nearest-neighbor graph construction, fuzzy graph weights, and low-dimensional attraction/repulsion optimization.
+- Each frame shows how the embedding unfolds while preserving neighborhood structure.
 
 ### 6. DBSCAN
 
-目录：
+Directory:
 
 ```bash
 dbscan/
 ```
 
-![DBSCAN 密度扩展过程演示](dbscan/dbscan-demo.png)
+![DBSCAN density expansion demo](dbscan/dbscan-demo.png)
 
-运行：
+Run:
 
 ```bash
 python3 dbscan/main.py
 ```
 
-特点：
+Highlights:
 
-- 不调用 `sklearn.cluster.DBSCAN`。
-- 自己生成月牙、螺旋、小岛和噪声组成的复杂密度点云。
-- 手写 eps 邻域、核心点判定、噪声标记和密度可达扩展。
-- 每一帧展示 DBSCAN 如何从核心点开始扩张簇。
+- Does not call `sklearn.cluster.DBSCAN`.
+- Generates a density-based dataset with moons, a spiral, an island, and noise.
+- Implements epsilon neighborhoods, core point detection, noise marking, and density-reachable expansion.
+- Each frame shows how DBSCAN grows clusters from core points.
 
 ### 7. PCA
 
-目录：
+Directory:
 
 ```bash
 pca/
 ```
 
-![PCA 主成分迭代过程演示](pca/pca-demo.png)
+![PCA power iteration demo](pca/pca-demo.png)
 
-运行：
+Run:
 
 ```bash
 python3 pca/main.py
 ```
 
-特点：
+Highlights:
 
-- 不调用 `sklearn.decomposition.PCA`。
-- 自己生成三维相关点云。
-- 手写中心化、协方差矩阵、幂迭代和正交化。
-- 每一帧展示主成分方向如何逐步旋转到最大方差方向。
+- Does not call `sklearn.decomposition.PCA`.
+- Generates a correlated 3D point cloud.
+- Implements centering, covariance matrix construction, power iteration, and orthogonalization.
+- Each frame shows the principal directions rotating toward maximum-variance directions.
 
-### 8. 随机森林
+### 8. Random Forest
 
-目录：
+Directory:
 
 ```bash
 random_forest/
 ```
 
-![随机森林逐步构建演示](random_forest/rf-demo.png)
+![Random Forest construction demo](random_forest/rf-demo.png)
 
-运行：
+Run:
 
 ```bash
 python3 random_forest/main.py
 ```
 
-特点：
+Highlights:
 
-- 不调用 `sklearn.ensemble.RandomForestClassifier`。
-- 自己生成复杂二维分类数据。
-- 手写 bootstrap、CART 节点分裂、Gini impurity 和森林投票。
-- 每一帧展示新节点 split 和投票边界如何变化。
+- Does not call `sklearn.ensemble.RandomForestClassifier`.
+- Generates a complex 2D classification dataset.
+- Implements bootstrap sampling, CART node splitting, Gini impurity, and forest voting.
+- Each frame shows new node splits and the evolving vote boundary.
 
-### 9. XGBoost 风格梯度提升树
+### 9. XGBoost-Style Gradient Boosted Trees
 
-目录：
+Directory:
 
 ```bash
 xgboost/
 ```
 
-![XGBoost 风格梯度提升过程演示](xgboost/xgboost-demo.png)
+![XGBoost-style boosting demo](xgboost/xgboost-demo.png)
 
-运行：
+Run:
 
 ```bash
 python3 xgboost/main.py
 ```
 
-特点：
+Highlights:
 
-- 不调用 `xgboost` 库。
-- 自己生成复杂二维二分类数据。
-- 手写 logloss 梯度/海森、二阶 CART、split gain 和叶子权重。
-- 每一帧展示提升树如何逐步修正当前概率边界。
+- Does not call the `xgboost` library.
+- Generates a complex 2D binary classification dataset.
+- Implements logloss gradients/Hessians, second-order CART trees, split gain, and leaf weights manually.
+- Each frame shows how boosted trees gradually correct the current probability boundary.
 
-## 设计原则
+### 10. Linear Regression
 
-- 算法训练过程尽量手写，避免调用库隐藏核心步骤。
-- 图形界面统一使用 Matplotlib。
-- 动画都带 `Previous`、`Next`、`Auto Play`、`Speed` 和 `Frame` 控件。
-- README 必须解释公式、过程和每一帧的含义。
-- 数据尽量选择能暴露算法特点的可视化数据，而不是只追求最终分数。
+Directory:
+
+```bash
+linear_regression/
+```
+
+Run:
+
+```bash
+python3 linear_regression/main.py
+```
+
+Highlights:
+
+- Does not call `sklearn.linear_model.LinearRegression`.
+- Generates noisy one-dimensional regression data with a few outliers.
+- Implements MSE, gradients, and gradient descent manually.
+- Each frame shows how the fitted line moves as \(w,b\) are optimized.
+
+### 11. Optimizer Trajectories
+
+Directory:
+
+```bash
+optimizers/
+```
+
+Run:
+
+```bash
+python3 optimizers/main.py
+```
+
+Highlights:
+
+- Compares GD, Momentum, Nesterov, AdaGrad, RMSProp, Adam, and AdamW.
+- Uses PyTorch optimizer implementations step by step when available.
+- Falls back to NumPy update rules if PyTorch cannot be imported.
+- Each frame moves colored balls across the same 3D loss surface.
+
+## Design Principles
+
+- Keep the training process as explicit as practical instead of hiding it inside library calls.
+- Use Matplotlib for consistent interactive visualizations.
+- Animations include `Previous`, `Next`, `Auto Play`, `Speed`, and `Frame` controls.
+- READMEs explain the formulas, the algorithmic process, and what each frame represents.
+- Datasets are selected or generated to reveal the behavior of each algorithm, not merely to maximize a score.
