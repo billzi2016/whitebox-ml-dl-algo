@@ -227,6 +227,8 @@ Directory:
 linear_regression/
 ```
 
+![Linear Regression gradient descent demo](linear_regression/lr-demo.png)
+
 Run:
 
 ```bash
@@ -247,6 +249,8 @@ Directory:
 ```bash
 optimizers/
 ```
+
+![Optimizer trajectories demo](optimizers/op-demo.png)
 
 Run:
 

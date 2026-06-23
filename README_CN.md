@@ -225,6 +225,8 @@ python3 xgboost/main.py
 linear_regression/
 ```
 
+![线性回归梯度下降演示](linear_regression/lr-demo.png)
+
 运行：
 
 ```bash
@@ -245,6 +247,8 @@ python3 linear_regression/main.py
 ```bash
 optimizers/
 ```
+
+![优化器轨迹演示](optimizers/op-demo.png)
 
 运行：
 

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.widgets import Button, Slider
 
-from optimizers.surface import loss_numpy, make_surface_grid
+from optimizers.surface import SURFACE_PRESETS, loss_numpy, make_surface_grid
 
 
 class OptimizerAnimator:
@@ -17,7 +17,7 @@ class OptimizerAnimator:
         self.playing = False
         self.last_tick = time.monotonic()
         self.history = [self.comparison.snapshot()]
-        self.xx, self.yy, self.zz = make_surface_grid()
+        self.xx, self.yy, self.zz = make_surface_grid(self.comparison.surface)
 
         self.fig = plt.figure(figsize=(15, 8))
         self.ax = self.fig.add_axes([0.06, 0.25, 0.72, 0.68], projection="3d")
@@ -77,12 +77,13 @@ class OptimizerAnimator:
         info_lines = [f"backend: {snapshot['backend']}", ""]
         for name, point in snapshot["points"].items():
             path = np.array([item["points"][name] for item in self.history[: self.frame_index + 1]])
-            z_path = loss_numpy(path)
+            z_path = loss_numpy(path, self.comparison.surface)
             self.ax.plot(path[:, 0], path[:, 1], z_path, color=colors[name], linewidth=2.0)
             self.ax.scatter([point[0]], [point[1]], [snapshot["losses"][name]], color=colors[name], s=55, label=name)
             info_lines.append(f"{name}: {snapshot['losses'][name]: .4f}")
 
-        self.ax.set_title(f"Optimizer trajectories on a 3D loss surface | step {snapshot['step']}")
+        surface_title = SURFACE_PRESETS[snapshot["surface"]]["title"]
+        self.ax.set_title(f"{surface_title} | step {snapshot['step']}")
         self.ax.set_xlabel("x")
         self.ax.set_ylabel("y")
         self.ax.set_zlabel("loss")

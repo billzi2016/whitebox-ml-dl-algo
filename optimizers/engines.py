@@ -2,7 +2,7 @@ import importlib
 
 import numpy as np
 
-from optimizers.surface import grad_numpy, loss_numpy, loss_torch
+from optimizers.surface import SURFACE_PRESETS, grad_numpy, loss_numpy, loss_torch
 
 
 OPTIMIZER_NAMES = [
@@ -19,10 +19,11 @@ OPTIMIZER_NAMES = [
 class NumpyOptimizerState:
     """Numpy fallback that mirrors common optimizer update rules."""
 
-    def __init__(self, name, start, lr):
+    def __init__(self, name, start, lr, surface):
         self.name = name
         self.theta = np.array(start, dtype=float)
         self.lr = lr
+        self.surface = surface
         self.t = 0
         self.m = np.zeros(2)
         self.v = np.zeros(2)
@@ -37,9 +38,9 @@ class NumpyOptimizerState:
 
         if self.name == "Nesterov":
             lookahead = self.theta - self.lr * self.beta * self.m
-            grad = grad_numpy(lookahead)
+            grad = grad_numpy(lookahead, self.surface)
         else:
-            grad = grad_numpy(self.theta)
+            grad = grad_numpy(self.theta, self.surface)
 
         if self.name == "GD":
             self.theta -= self.lr * grad
@@ -68,6 +69,9 @@ class NumpyOptimizerState:
             v_hat = self.v / (1 - self.beta2**self.t)
             self.theta -= self.lr * (m_hat / (np.sqrt(v_hat) + self.eps) + self.weight_decay * self.theta)
 
+        limit = SURFACE_PRESETS[self.surface]["limit"] * 0.98
+        self.theta = np.clip(self.theta, -limit, limit)
+
     def point(self):
         return self.theta.copy()
 
@@ -75,9 +79,10 @@ class NumpyOptimizerState:
 class TorchOptimizerState:
     """Thin wrapper around torch.optim. Each animation step calls optimizer.step()."""
 
-    def __init__(self, name, start, lr, torch):
+    def __init__(self, name, start, lr, surface, torch):
         self.name = name
         self.torch = torch
+        self.surface = surface
         self.theta = torch.tensor(start, dtype=torch.float32, requires_grad=True)
 
         if name == "GD":
@@ -99,9 +104,12 @@ class TorchOptimizerState:
 
     def step(self):
         self.optimizer.zero_grad()
-        loss = loss_torch(self.theta, self.torch)
+        loss = loss_torch(self.theta, self.torch, self.surface)
         loss.backward()
         self.optimizer.step()
+        limit = SURFACE_PRESETS[self.surface]["limit"] * 0.98
+        with self.torch.no_grad():
+            self.theta.clamp_(-limit, limit)
 
     def point(self):
         return self.theta.detach().cpu().numpy().copy()
@@ -110,9 +118,11 @@ class TorchOptimizerState:
 class OptimizerComparison:
     """Runs several optimizers step-by-step and stores trajectories."""
 
-    def __init__(self, start=(-4.2, 3.6), lr=0.055):
-        self.start = np.array(start, dtype=float)
-        self.lr = lr
+    def __init__(self, surface="rugged", start=None, lr=None):
+        self.surface = surface
+        preset = SURFACE_PRESETS[surface]
+        self.start = np.array(preset["start"] if start is None else start, dtype=float)
+        self.lr = preset["lr"] if lr is None else lr
         self.backend = "numpy"
         self.torch = None
 
@@ -133,8 +143,8 @@ class OptimizerComparison:
 
     def _make_state(self, name):
         if self.torch is not None:
-            return TorchOptimizerState(name, self.start, self.lr, self.torch)
-        return NumpyOptimizerState(name, self.start, self.lr)
+            return TorchOptimizerState(name, self.start, self.lr, self.surface, self.torch)
+        return NumpyOptimizerState(name, self.start, self.lr, self.surface)
 
     def step(self):
         for state in self.states:
@@ -143,12 +153,13 @@ class OptimizerComparison:
 
     def snapshot(self):
         points = {state.name: state.point() for state in self.states}
-        losses = {name: float(loss_numpy(point)) for name, point in points.items()}
+        losses = {name: float(loss_numpy(point, self.surface)) for name, point in points.items()}
         return {
             "points": points,
             "losses": losses,
             "step": self.step_index,
             "backend": self.backend,
+            "surface": self.surface,
         }
 
     def restore(self, snapshot):
